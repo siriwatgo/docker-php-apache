@@ -8,15 +8,17 @@ RUN apt-get update && apt-get install -y freetds-bin freetds-dev freetds-common 
     libpng-dev \
     libssl-dev \
     libzip-dev && \
-    apt-get clean && \
-    # Install mssql drivers
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-tools.list && \
+    apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+# Install mssql drivers
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get -y update && \
     export DEBIAN_FRONTEND=noninteractive && ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
-# RUN apt-get update && apt-get upgrade
-# RUN export DEBIAN_FRONTEND=noninteractive && ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
-# RUN ln -fsv /opt/mssql-tools/bin/* /usr/bin
+
+RUN apt-get install -y wget
+RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
+    dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 
 # Install php extension
 RUN docker-php-ext-configure intl --enable-intl && \
